@@ -128,7 +128,7 @@ func compareXML(t *testing.T, xml1 string, xml2 string) {
 }
 
 func canonXML(t *testing.T, xml string) string {
-	cmd := exec.Command("xmllint", "-c14n11", "-")
+	cmd := exec.Command("xmllint", "-c14n", "-")
 	cmdIn, err := cmd.StdinPipe()
 	if err != nil {
 		t.Fatal(err)
