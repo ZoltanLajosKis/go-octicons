@@ -16,3 +16,7 @@ install:
   - sudo apt-get -y install nodejs libxml2-utils
 script:
   - make test
+after_success:
+  - go get github.com/mattn/goveralls
+  - goveralls -coverprofile=cover.out -service=travis-ci
+

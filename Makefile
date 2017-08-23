@@ -22,7 +22,7 @@ update-deps: dep
 .PHONY: test
 test: | node npm xmllint
 		npm install --no-save octicons@6.0.1
-		go test -cover -v $(PACKAGES)
+		go test -coverprofile=cover.out -v $(PACKAGES)
 		rm -rf node_modules
 
 .PHONY: node
