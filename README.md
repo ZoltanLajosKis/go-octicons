@@ -1,5 +1,9 @@
 # go-octicons
 
+[![Build Status](https://travis-ci.org/ZoltanLajosKis/go-octicons.svg?branch=master)](https://travis-ci.org/ZoltanLajosKis/go-octicons)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ZoltanLajosKis/go-octicons)](https://goreportcard.com/report/github.com/ZoltanLajosKis/go-octicons)
+[![Coverage Status](https://coveralls.io/repos/github/ZoltanLajosKis/go-octicons/badge.svg?branch=master)](https://coveralls.io/github/ZoltanLajosKis/go-octicons?branch=master)
+
 Go package for GitHub Octicons. Based on npm version 6.0.1.
 
 
