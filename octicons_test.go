@@ -114,6 +114,27 @@ func TestOcticons(t *testing.T) {
 	assertEqual(t, Octicons("no-such-octicon-symbol"), nil)
 }
 
+func TestCached(t *testing.T) {
+	name := "logo-github"
+	octi := Octicons(name)
+
+	goXML := octi.ToSVG(nil)
+	nodeXML := nodeCmd(t, "require('octicons')[\""+name+"\"].toSVG()")
+	compareXML(t, goXML, nodeXML)
+
+	goXML = octi.ToSVG(nil)
+	nodeXML = nodeCmd(t, "require('octicons')[\""+name+"\"].toSVG()")
+	compareXML(t, goXML, nodeXML)
+
+	goXML = octi.ToSVGUse(nil)
+	nodeXML = nodeCmd(t, "require('octicons')[\""+name+"\"].toSVGUse()")
+	compareXML(t, goXML, nodeXML)
+
+	goXML = octi.ToSVGUse(nil)
+	nodeXML = nodeCmd(t, "require('octicons')[\""+name+"\"].toSVGUse()")
+	compareXML(t, goXML, nodeXML)
+}
+
 func nodeCmd(t *testing.T, command string) string {
 	out, err := exec.Command("node", "-p", command).Output()
 	if err != nil {

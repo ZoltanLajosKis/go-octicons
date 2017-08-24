@@ -50,14 +50,14 @@ func writeContent(b *bytes.Buffer, items dataItems) {
 	fmt.Fprintf(b, "}\n")
 	fmt.Fprintf(b, "\n")
 	fmt.Fprintf(b, "type octicon struct {\n")
-	fmt.Fprintf(b, "	symbol          string\n")
-	fmt.Fprintf(b, "	keywords        []string\n")
-	fmt.Fprintf(b, "	path            string\n")
-	fmt.Fprintf(b, "	options         Opts\n")
-	fmt.Fprintf(b, "	width           int\n")
-	fmt.Fprintf(b, "	height          int\n")
-	fmt.Fprintf(b, "	toSVGDefault    string\n")
-	fmt.Fprintf(b, "	toSVGUseDefault string\n")
+	fmt.Fprintf(b, "	symbol         string\n")
+	fmt.Fprintf(b, "	keywords       []string\n")
+	fmt.Fprintf(b, "	path           string\n")
+	fmt.Fprintf(b, "	options        Opts\n")
+	fmt.Fprintf(b, "	width          int\n")
+	fmt.Fprintf(b, "	height         int\n")
+	fmt.Fprintf(b, "	toSVGCached    string\n")
+	fmt.Fprintf(b, "	toSVGUseCached string\n")
 	fmt.Fprintf(b, "}\n")
 	fmt.Fprintf(b, "\n")
 	fmt.Fprintf(b, "var (\n")
@@ -112,10 +112,8 @@ func writeOcticonVar(b *bytes.Buffer, name string, item *dataItem) {
 	fmt.Fprintf(b, "			\"class\":       \"octicon octicon-%s\",\n", name)
 	fmt.Fprintf(b, "			\"aria-hidden\": \"true\",\n")
 	fmt.Fprintf(b, "		},\n")
-	fmt.Fprintf(b, "		width:           %d,\n", item.width)
-	fmt.Fprintf(b, "		height:          %d,\n", item.height)
-	fmt.Fprintf(b, "		toSVGDefault:    `%s`,\n", toSVGDefault(name, item))
-	fmt.Fprintf(b, "		toSVGUseDefault: `%s`,\n", toSVGUseDefault(name, item))
+	fmt.Fprintf(b, "		width:  %d,\n", item.width)
+	fmt.Fprintf(b, "		height: %d,\n", item.height)
 	fmt.Fprintf(b, "	}\n")
 }
 
@@ -130,15 +128,6 @@ func strArr(sa []string) string {
 	}
 
 	return strings.Join(qsa, ", ")
-}
-
-func toSVGDefault(name string, item *dataItem) string {
-	return fmt.Sprintf(`<svg version="1.1" width="%d" height="%d" viewBox="0 0 %d %d" class="octicon octicon-%s" aria-hidden="true">%s</svg>`,
-		item.width, item.height, item.width, item.height, name, item.path)
-}
-
-func toSVGUseDefault(name string, item *dataItem) string {
-	return fmt.Sprintf(`<svg version="1.1" width="%d" height="%d" viewBox="0 0 %d %d" class="octicon octicon-%s" aria-hidden="true"><use xlink:href="#%s"/></svg>`, item.width, item.height, item.width, item.height, name, name)
 }
 
 func writeOcticons(b *bytes.Buffer, items dataItems) {
@@ -306,25 +295,35 @@ func writeInterfaceImpl(b *bytes.Buffer) {
 
 	fmt.Fprintf(b, "// ToSVG returns the string representation of the svg for the icon.\n")
 	fmt.Fprintf(b, "func (o *octicon) ToSVG(opts Opts) string {\n")
-	fmt.Fprintf(b, "	if opts == nil {\n")
-	fmt.Fprintf(b, "		return o.toSVGDefault\n")
+	fmt.Fprintf(b, "	if len(opts) == 0 && o.toSVGCached != \"\" {\n")
+	fmt.Fprintf(b, "		return o.toSVGCached\n")
 	fmt.Fprintf(b, "	}\n")
 	fmt.Fprintf(b, "\n")
 	fmt.Fprintf(b, "	attrs := o.htmlAttribs(opts)\n")
+	fmt.Fprintf(b, "	svg := fmt.Sprintf(`<svg %%s>%%s</svg>`, attrs, o.path)\n")
 	fmt.Fprintf(b, "\n")
-	fmt.Fprintf(b, "	return fmt.Sprintf(`<svg %%s>%%s</svg>`, attrs, o.path)\n")
+	fmt.Fprintf(b, "	if len(opts) == 0 {\n")
+	fmt.Fprintf(b, "		o.toSVGCached = svg\n")
+	fmt.Fprintf(b, "	}\n")
+	fmt.Fprintf(b, "\n")
+	fmt.Fprintf(b, "	return svg\n")
 	fmt.Fprintf(b, "}\n")
 	fmt.Fprintf(b, "\n")
 
 	fmt.Fprintf(b, "// ToSVGUse returns the string representation of the svg for the icon to use with sprites.\n")
 	fmt.Fprintf(b, "func (o *octicon) ToSVGUse(opts Opts) string {\n")
-	fmt.Fprintf(b, "	if opts == nil {\n")
-	fmt.Fprintf(b, "		return o.toSVGUseDefault\n")
+	fmt.Fprintf(b, "	if len(opts) == 0 && o.toSVGUseCached != \"\" {\n")
+	fmt.Fprintf(b, "		return o.toSVGUseCached\n")
 	fmt.Fprintf(b, "	}\n")
 	fmt.Fprintf(b, "\n")
 	fmt.Fprintf(b, "	attrs := o.htmlAttribs(opts)\n")
+	fmt.Fprintf(b, "	svg := fmt.Sprintf(`<svg %%s><use xlink:href=\"#%%s\"/></svg>`, attrs, o.symbol)\n")
 	fmt.Fprintf(b, "\n")
-	fmt.Fprintf(b, "	return fmt.Sprintf(`<svg %%s><use xlink:href=\"#%%s\"/></svg>`, attrs, o.symbol)\n")
+	fmt.Fprintf(b, "	if len(opts) == 0 {\n")
+	fmt.Fprintf(b, "		o.toSVGUseCached = svg\n")
+	fmt.Fprintf(b, "	}\n")
+	fmt.Fprintf(b, "\n")
+	fmt.Fprintf(b, "	return svg\n")
 	fmt.Fprintf(b, "}\n")
 }
 
